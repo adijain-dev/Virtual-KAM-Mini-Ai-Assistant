@@ -1,0 +1,138 @@
+[
+  {
+    "functionDeclarations": [
+      {
+        "name": "get_seller_metrics",
+        "description": "Returns the seller's profile and last-month vs this-month metrics (sales, orders, cancellation rate, average selling price, out-of-stock count) with percentage changes. Call this first on every call."
+      },
+      {
+        "name": "diagnose_sales_drop",
+        "description": "Runs a revenue bridge on the seller's data: splits the drop in net sales into order-volume, cancellation and price effects, estimates how much of the order decline is explained by out-of-stock products, lists what was ruled out and which data is missing, and returns a root-cause hypothesis. Call this right after get_seller_metrics."
+      },
+      {
+        "name": "get_cancellation_breakdown",
+        "description": "Returns this month's cancelled orders split by reason, and how much of it the seller can control. Use when discussing cancellations."
+      },
+      {
+        "name": "get_out_of_stock_products",
+        "description": "Returns the seller's out-of-stock products ranked by estimated lost orders, with days out of stock and restock lead time. Use when discussing inventory or planning restocks.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "description": "How many top products to return (default 5, max 18)."
+            }
+          }
+        }
+      },
+      {
+        "name": "get_traffic_and_visibility",
+        "description": "Returns impressions, conversion rate, search rank, ad status and listing quality for last month vs this month, if available for this seller. Use when discussing traffic, visibility, ads or ranking. If it reports that no data is available, ask the seller instead."
+      },
+      {
+        "name": "get_pricing_insights",
+        "description": "Returns the seller's average selling price change, how many listings were repriced and how the price compares with the competitor average, if available. Use when discussing prices or competitiveness."
+      },
+      {
+        "name": "create_action_plan",
+        "description": "Saves the agreed action plan for the seller. Call once the seller has heard the recommendations, before the closing summary.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "issues": {
+              "type": "array",
+              "description": "The 1-3 key issues found, each in one plain sentence.",
+              "items": {
+                "type": "string"
+              }
+            },
+            "actions": {
+              "type": "array",
+              "description": "2-3 concrete actions, most impactful first.",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "description": "Short action name."
+                  },
+                  "detail": {
+                    "type": "string",
+                    "description": "Specific steps, naming products where relevant."
+                  },
+                  "priority": {
+                    "type": "string",
+                    "enum": [
+                      "high",
+                      "medium",
+                      "low"
+                    ]
+                  },
+                  "dueInDays": {
+                    "type": "integer",
+                    "description": "Days from today by which the seller should do it."
+                  },
+                  "expectedImpact": {
+                    "type": "string",
+                    "description": "Expected effect, described as an estimate."
+                  }
+                },
+                "required": [
+                  "title",
+                  "detail",
+                  "priority",
+                  "dueInDays"
+                ]
+              }
+            }
+          },
+          "required": [
+            "issues",
+            "actions"
+          ]
+        }
+      },
+      {
+        "name": "schedule_followup",
+        "description": "Books a follow-up call with the seller to check progress on the action plan.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "inDays": {
+              "type": "integer",
+              "description": "Days from today (1 to 14)."
+            },
+            "reason": {
+              "type": "string",
+              "description": "What the follow-up call will check."
+            }
+          },
+          "required": [
+            "inDays",
+            "reason"
+          ]
+        }
+      },
+      {
+        "name": "send_summary",
+        "description": "Sends the saved action plan and follow-up date to the seller as a written message (mock). Requires create_action_plan to have been called.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "channel": {
+              "type": "string",
+              "enum": [
+                "whatsapp",
+                "sms"
+              ]
+            }
+          },
+          "required": [
+            "channel"
+          ]
+        }
+      }
+    ]
+  }
+]

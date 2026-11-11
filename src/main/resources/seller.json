@@ -1,0 +1,411 @@
+{
+  "defaultSellerId": "SD-S-48213",
+  "sellers": [
+    {
+      "id": "SD-S-48213",
+      "name": "Rajesh Kumar",
+      "business": "Kumar Home & Kitchen Store",
+      "category": "Home & Kitchen",
+      "activeListings": 96,
+      "sellingOnSnapdealSince": 2022,
+      "isBriefSeller": true,
+      "metrics": {
+        "lastMonth": {
+          "sales": 200000,
+          "orders": 400,
+          "cancellationRate": 8,
+          "avgSellingPrice": 500,
+          "outOfStockProducts": 5
+        },
+        "thisMonth": {
+          "sales": 135000,
+          "orders": 270,
+          "cancellationRate": 14,
+          "avgSellingPrice": 500,
+          "outOfStockProducts": 18
+        }
+      },
+      "cancellationReasonsThisMonth": [
+        {
+          "reason": "Seller cancelled: item out of stock",
+          "sharePct": 58,
+          "sellerControllable": true
+        },
+        {
+          "reason": "Seller cancelled: could not dispatch in time",
+          "sharePct": 19,
+          "sellerControllable": true
+        },
+        {
+          "reason": "Customer cancelled: delivery delay or changed mind",
+          "sharePct": 23,
+          "sellerControllable": false
+        }
+      ],
+      "outOfStockProducts": [
+        {
+          "sku": "SD-HK-1042",
+          "name": "Stainless Steel Water Bottle 1L",
+          "daysOutOfStock": 24,
+          "estLostOrders": 18,
+          "restockLeadDays": 5
+        },
+        {
+          "sku": "SD-HK-1017",
+          "name": "Non-stick Tawa 28 cm",
+          "daysOutOfStock": 21,
+          "estLostOrders": 14,
+          "restockLeadDays": 7
+        },
+        {
+          "sku": "SD-HK-1088",
+          "name": "Microfibre Cleaning Cloth, Pack of 6",
+          "daysOutOfStock": 20,
+          "estLostOrders": 12,
+          "restockLeadDays": 3
+        },
+        {
+          "sku": "SD-HK-1105",
+          "name": "Glass Storage Jars, Set of 3",
+          "daysOutOfStock": 18,
+          "estLostOrders": 10,
+          "restockLeadDays": 6
+        },
+        {
+          "sku": "SD-HK-1023",
+          "name": "Silicone Spatula Set",
+          "daysOutOfStock": 17,
+          "estLostOrders": 9,
+          "restockLeadDays": 4
+        },
+        {
+          "sku": "SD-HK-1061",
+          "name": "Digital Kitchen Weighing Scale",
+          "daysOutOfStock": 15,
+          "estLostOrders": 8,
+          "restockLeadDays": 8
+        },
+        {
+          "sku": "SD-HK-1134",
+          "name": "Plastic Lunch Box, Set of 3",
+          "daysOutOfStock": 14,
+          "estLostOrders": 7,
+          "restockLeadDays": 5
+        },
+        {
+          "sku": "SD-HK-1150",
+          "name": "Steel Ladle Set of 4",
+          "daysOutOfStock": 12,
+          "estLostOrders": 6,
+          "restockLeadDays": 4
+        },
+        {
+          "sku": "SD-HK-1072",
+          "name": "Wall Hooks, Pack of 10",
+          "daysOutOfStock": 12,
+          "estLostOrders": 5,
+          "restockLeadDays": 3
+        },
+        {
+          "sku": "SD-HK-1091",
+          "name": "Vegetable Chopper",
+          "daysOutOfStock": 11,
+          "estLostOrders": 4,
+          "restockLeadDays": 9
+        },
+        {
+          "sku": "SD-HK-1119",
+          "name": "Dish Drying Rack",
+          "daysOutOfStock": 10,
+          "estLostOrders": 3,
+          "restockLeadDays": 10
+        },
+        {
+          "sku": "SD-HK-1033",
+          "name": "Cotton Kitchen Towels, Pack of 4",
+          "daysOutOfStock": 9,
+          "estLostOrders": 3,
+          "restockLeadDays": 4
+        },
+        {
+          "sku": "SD-HK-1128",
+          "name": "Insulated Flask 500 ml",
+          "daysOutOfStock": 8,
+          "estLostOrders": 2,
+          "restockLeadDays": 6
+        },
+        {
+          "sku": "SD-HK-1046",
+          "name": "Plastic Storage Container Set",
+          "daysOutOfStock": 8,
+          "estLostOrders": 2,
+          "restockLeadDays": 5
+        },
+        {
+          "sku": "SD-HK-1157",
+          "name": "Silicone Baking Mat",
+          "daysOutOfStock": 6,
+          "estLostOrders": 2,
+          "restockLeadDays": 7
+        },
+        {
+          "sku": "SD-HK-1099",
+          "name": "Egg Boiler Rack",
+          "daysOutOfStock": 5,
+          "estLostOrders": 1,
+          "restockLeadDays": 4
+        },
+        {
+          "sku": "SD-HK-1081",
+          "name": "Pressure Cooker Gasket",
+          "daysOutOfStock": 4,
+          "estLostOrders": 1,
+          "restockLeadDays": 3
+        },
+        {
+          "sku": "SD-HK-1166",
+          "name": "Magnetic Spice Rack",
+          "daysOutOfStock": 3,
+          "estLostOrders": 1,
+          "restockLeadDays": 6
+        }
+      ],
+      "assumptions": [
+        "Sales = orders x average selling price, so 'orders' means gross orders placed (before cancellations).",
+        "Cancellation rate is measured against gross orders.",
+        "Cancellation reasons, the out-of-stock product list and the estimated lost orders per product are mock data created for this demo.",
+        "No traffic, impressions, ratings, returns, ad-spend or competitor-price data is available."
+      ]
+    },
+    {
+      "id": "SD-S-51907",
+      "name": "Anita Verma",
+      "business": "Verma Fashion Accessories",
+      "category": "Fashion Accessories",
+      "activeListings": 74,
+      "sellingOnSnapdealSince": 2021,
+      "isBriefSeller": false,
+      "metrics": {
+        "lastMonth": {
+          "sales": 200000,
+          "orders": 400,
+          "cancellationRate": 8,
+          "avgSellingPrice": 500,
+          "outOfStockProducts": 5
+        },
+        "thisMonth": {
+          "sales": 140000,
+          "orders": 250,
+          "cancellationRate": 9,
+          "avgSellingPrice": 560,
+          "outOfStockProducts": 6
+        }
+      },
+      "traffic": {
+        "lastMonth": {
+          "impressions": 52000
+        },
+        "thisMonth": {
+          "impressions": 51000
+        }
+      },
+      "visibility": {
+        "lastMonth": {
+          "avgSearchRank": 7,
+          "adsActive": true,
+          "lowQualityListings": 4
+        },
+        "thisMonth": {
+          "avgSearchRank": 8,
+          "adsActive": true,
+          "lowQualityListings": 4
+        }
+      },
+      "pricing": {
+        "competitorAvgPrice": {
+          "lastMonth": 490,
+          "thisMonth": 480
+        },
+        "listingsRepriced": 34
+      },
+      "cancellationReasonsThisMonth": [
+        {
+          "reason": "Customer cancelled: found a cheaper option or changed mind",
+          "sharePct": 46,
+          "sellerControllable": false
+        },
+        {
+          "reason": "Seller cancelled: could not dispatch in time",
+          "sharePct": 30,
+          "sellerControllable": true
+        },
+        {
+          "reason": "Seller cancelled: item out of stock",
+          "sharePct": 24,
+          "sellerControllable": true
+        }
+      ],
+      "outOfStockProducts": [
+        {
+          "sku": "SD-FA-2011",
+          "name": "Oxidised Silver Jhumkas",
+          "daysOutOfStock": 9,
+          "estLostOrders": 2,
+          "restockLeadDays": 5
+        },
+        {
+          "sku": "SD-FA-2034",
+          "name": "Pearl Hair Clips, Set of 6",
+          "daysOutOfStock": 7,
+          "estLostOrders": 1,
+          "restockLeadDays": 4
+        },
+        {
+          "sku": "SD-FA-2056",
+          "name": "Faux Leather Wallet for Women",
+          "daysOutOfStock": 6,
+          "estLostOrders": 1,
+          "restockLeadDays": 6
+        },
+        {
+          "sku": "SD-FA-2078",
+          "name": "Printed Cotton Scarf",
+          "daysOutOfStock": 5,
+          "estLostOrders": 1,
+          "restockLeadDays": 5
+        },
+        {
+          "sku": "SD-FA-2092",
+          "name": "Layered Chain Necklace",
+          "daysOutOfStock": 4,
+          "estLostOrders": 1,
+          "restockLeadDays": 3
+        },
+        {
+          "sku": "SD-FA-2103",
+          "name": "Canvas Tote Bag",
+          "daysOutOfStock": 4,
+          "estLostOrders": 1,
+          "restockLeadDays": 7
+        }
+      ],
+      "assumptions": [
+        "EXTRA MOCK SELLER created for this demo; not part of the assignment brief.",
+        "Sales = orders x average selling price (orders are gross orders placed).",
+        "Impressions, competitor prices, cancellation reasons and the out-of-stock list are mock data.",
+        "No ratings, returns or ad-spend data is available."
+      ]
+    },
+    {
+      "id": "SD-S-60342",
+      "name": "Imran Qureshi",
+      "business": "Qureshi Home Decor",
+      "category": "Home Decor",
+      "activeListings": 88,
+      "sellingOnSnapdealSince": 2023,
+      "isBriefSeller": false,
+      "metrics": {
+        "lastMonth": {
+          "sales": 200000,
+          "orders": 400,
+          "cancellationRate": 8,
+          "avgSellingPrice": 500,
+          "outOfStockProducts": 5
+        },
+        "thisMonth": {
+          "sales": 135000,
+          "orders": 270,
+          "cancellationRate": 8,
+          "avgSellingPrice": 500,
+          "outOfStockProducts": 5
+        }
+      },
+      "traffic": {
+        "lastMonth": {
+          "impressions": 80000
+        },
+        "thisMonth": {
+          "impressions": 51000
+        }
+      },
+      "visibility": {
+        "lastMonth": {
+          "avgSearchRank": 6,
+          "adsActive": true,
+          "lowQualityListings": 6
+        },
+        "thisMonth": {
+          "avgSearchRank": 15,
+          "adsActive": false,
+          "lowQualityListings": 21
+        }
+      },
+      "pricing": {
+        "competitorAvgPrice": {
+          "lastMonth": 500,
+          "thisMonth": 495
+        }
+      },
+      "cancellationReasonsThisMonth": [
+        {
+          "reason": "Customer cancelled: delivery delay or changed mind",
+          "sharePct": 55,
+          "sellerControllable": false
+        },
+        {
+          "reason": "Seller cancelled: item out of stock",
+          "sharePct": 25,
+          "sellerControllable": true
+        },
+        {
+          "reason": "Seller cancelled: could not dispatch in time",
+          "sharePct": 20,
+          "sellerControllable": true
+        }
+      ],
+      "outOfStockProducts": [
+        {
+          "sku": "SD-HD-3004",
+          "name": "Macrame Wall Hanging",
+          "daysOutOfStock": 6,
+          "estLostOrders": 1,
+          "restockLeadDays": 5
+        },
+        {
+          "sku": "SD-HD-3017",
+          "name": "Ceramic Planter Set",
+          "daysOutOfStock": 5,
+          "estLostOrders": 1,
+          "restockLeadDays": 6
+        },
+        {
+          "sku": "SD-HD-3029",
+          "name": "LED Fairy Lights 10 m",
+          "daysOutOfStock": 5,
+          "estLostOrders": 1,
+          "restockLeadDays": 4
+        },
+        {
+          "sku": "SD-HD-3041",
+          "name": "Scented Candle Trio",
+          "daysOutOfStock": 4,
+          "estLostOrders": 1,
+          "restockLeadDays": 5
+        },
+        {
+          "sku": "SD-HD-3058",
+          "name": "Jute Table Runner",
+          "daysOutOfStock": 3,
+          "estLostOrders": 1,
+          "restockLeadDays": 3
+        }
+      ],
+      "assumptions": [
+        "EXTRA MOCK SELLER created for this demo; not part of the assignment brief.",
+        "Sales = orders x average selling price (orders are gross orders placed).",
+        "Impressions, search rank, ad status, listing quality, competitor prices, cancellation reasons and the out-of-stock list are mock data.",
+        "No ratings, returns or ad-spend data is available."
+      ]
+    }
+  ]
+}

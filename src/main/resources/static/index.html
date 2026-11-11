@@ -1,0 +1,743 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Snapdeal Virtual KAM</title>
+<style>
+  :root {
+    --red: #e40046;
+    --red-soft: #fde8ee;
+    --ink: #1c1d21;
+    --mute: #6a6e76;
+    --line: #e4e6ea;
+    --bg: #f5f6f8;
+    --card: #ffffff;
+    --good: #12805c;
+    --bad: #c4231c;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --red-soft: #3a1520;
+      --ink: #f1f2f4;
+      --mute: #a3a7af;
+      --line: #2b2e35;
+      --bg: #101216;
+      --card: #181b21;
+      --good: #4cc79a;
+      --bad: #ff7b72;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    font-family: "Segoe UI", system-ui, -apple-system, "Noto Sans", "Noto Sans Devanagari", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.5;
+  }
+  header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 24px; background: var(--card); border-bottom: 1px solid var(--line);
+  }
+  header .logo { font-weight: 800; font-size: 20px; color: var(--red); letter-spacing: -0.3px; }
+  header .sub { color: var(--mute); font-size: 14px; }
+
+  main {
+    max-width: 1100px; margin: 0 auto; padding: 24px;
+    display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 20px;
+  }
+  @media (max-width: 860px) { main { grid-template-columns: 1fr; padding: 16px; } }
+
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 18px; }
+  .card + .card { margin-top: 16px; }
+  h2 { margin: 0 0 12px; font-size: 16px; font-weight: 700; }
+
+  /* call card */
+  .call { display: flex; flex-direction: column; align-items: center; text-align: center; }
+  .orb {
+    width: 132px; height: 132px; border-radius: 50%; border: 0; cursor: pointer; margin: 8px 0 14px;
+    background: radial-gradient(circle at 35% 30%, #ff6b93, var(--red) 62%);
+    box-shadow: 0 0 0 0 rgba(228, 0, 70, .35);
+    transition: transform .2s, filter .3s;
+  }
+  .orb:focus-visible { outline: 3px solid var(--ink); outline-offset: 4px; }
+  .orb.idle { filter: grayscale(.55) opacity(.8); }
+  .orb.listening { animation: ring 1.5s ease-out infinite; }
+  .orb.thinking { filter: saturate(.6); animation: breathe 1.1s ease-in-out infinite alternate; }
+  .orb.speaking { animation: talk .55s ease-in-out infinite alternate; }
+  @keyframes ring { 0% { box-shadow: 0 0 0 0 rgba(228,0,70,.45);} 100% { box-shadow: 0 0 0 34px rgba(228,0,70,0);} }
+  @keyframes breathe { from { transform: scale(.94);} to { transform: scale(1.0);} }
+  @keyframes talk { from { transform: scale(1);} to { transform: scale(1.1);} }
+  @media (prefers-reduced-motion: reduce) { .orb { animation: none !important; } }
+
+  #status { min-height: 24px; color: var(--mute); font-size: 15px; }
+  .controls { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; justify-content: center; }
+  .voice-bar { display: flex; align-items: center; gap: 10px; margin-top: 10px; flex-wrap: wrap; justify-content: center; }
+  .toggle-pill { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; padding: 4px 12px; border-radius: 999px; background: var(--bg); border: 1px solid var(--line); font-size: 13px; font-weight: 600; user-select: none; }
+  .toggle-pill input { margin: 0; accent-color: var(--good); }
+  .lang-select { font: inherit; font-size: 13px; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--ink); cursor: pointer; }
+  button.btn {
+    font: inherit; font-weight: 600; padding: 10px 20px; border-radius: 999px; cursor: pointer;
+    border: 1px solid var(--line); background: var(--card); color: var(--ink);
+  }
+  button.btn:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+  button.primary { background: var(--red); border-color: var(--red); color: #fff; }
+  button.end { background: var(--ink); border-color: var(--ink); color: var(--card); }
+
+  #live { min-height: 22px; margin-top: 10px; color: var(--mute); font-style: italic; font-size: 14px; }
+  #transcript {
+    width: 100%; max-height: 300px; overflow-y: auto; margin-top: 10px; text-align: left;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .msg { padding: 9px 13px; border-radius: 14px; max-width: 88%; font-size: 15px; white-space: pre-wrap; }
+  .msg.disha { background: var(--red-soft); align-self: flex-start; border-bottom-left-radius: 4px; }
+  .msg.seller { background: var(--bg); border: 1px solid var(--line); align-self: flex-end; border-bottom-right-radius: 4px; }
+  .msg.err { color: var(--bad); align-self: stretch; max-width: 100%; }
+  .msg small { display: block; color: var(--mute); font-size: 12px; margin-bottom: 1px; }
+
+  details.typebox { width: 100%; margin-top: 12px; text-align: left; color: var(--mute); font-size: 13px; }
+  details.typebox form { display: flex; gap: 8px; margin-top: 8px; }
+  details.typebox input {
+    flex: 1; font: inherit; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--line);
+    background: var(--card); color: var(--ink);
+  }
+
+  /* data cards */
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 7px 4px; border-bottom: 1px solid var(--line); }
+  th { color: var(--mute); font-weight: 600; font-size: 13px; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .down { color: var(--bad); font-weight: 600; }
+  .up { color: var(--good); font-weight: 600; }
+
+  .empty { color: var(--mute); font-size: 14px; }
+  #actions { display: flex; flex-direction: column; gap: 8px; }
+  #actions details { border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; font-size: 14px; }
+  #actions summary { cursor: pointer; }
+  #actions pre { margin: 8px 0 0; white-space: pre-wrap; word-break: break-word; font-size: 12px; max-height: 180px; overflow: auto; color: var(--mute); }
+
+  .plan-item { border-left: 3px solid var(--red); padding: 4px 0 4px 12px; margin: 10px 0; }
+  .plan-item b { display: block; }
+  .tag { display: inline-block; font-size: 12px; padding: 1px 8px; border-radius: 999px; background: var(--red-soft); color: var(--red); margin-left: 6px; font-weight: 600; }
+  .wa { background: #dcf8c6; color: #111; border-radius: 12px; padding: 10px 12px; font-size: 13px; white-space: pre-wrap; margin-top: 8px; }
+  @media (prefers-color-scheme: dark) { .wa { background: #1f3b2b; color: #e6f4ea; } }
+
+  .snap-head { display: flex; justify-content: space-between; align-items: center; }
+  .snap-head h2 { margin: 0; }
+  button.link { font: inherit; font-size: 13px; background: none; border: 0; color: var(--red); cursor: pointer; padding: 4px 6px; }
+  button.link:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  select#sellerSelect {
+    width: 100%; font: inherit; font-size: 14px; padding: 8px 10px; margin: 10px 0 8px;
+    border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--ink);
+  }
+  select#sellerSelect:disabled { opacity: .6; }
+  #seller table { font-size: 13px; }
+  #seller th, #seller td { padding: 4px 4px; }
+  .note { color: var(--mute); font-size: 12px; margin-top: 8px; }
+</style>
+</head>
+<body>
+<header>
+  <span class="logo">Snapdeal</span>
+  <span class="sub">Virtual KAM: a voice assistant for sellers (demo with mock data)</span>
+</header>
+
+<main>
+  <section>
+    <div class="card call">
+      <h2>Talk to Disha</h2>
+      <button id="orb" class="orb idle" aria-label="Start or interrupt the call"></button>
+      <div id="status" role="status" aria-live="polite"></div>
+
+      <div class="controls">
+        <button id="callBtn" class="btn primary">Call Disha</button>
+        <button id="endBtn" class="btn end" hidden>End call</button>
+      </div>
+
+      <div class="voice-bar">
+        <label class="toggle-pill" title="Instant voice playback with 0ms network lag">
+          <input type="checkbox" id="fastVoiceToggle" checked>
+          <span>⚡ Instant Voice</span>
+        </label>
+        <select id="langSelect" class="lang-select" title="Spoken language recognition">
+          <option value="en-IN">English / Hinglish</option>
+          <option value="hi-IN">हिंदी (Hindi)</option>
+        </select>
+      </div>
+
+      <div id="live" aria-live="polite"></div>
+      <div id="transcript" aria-live="polite"></div>
+
+      <details class="typebox">
+        <summary>No microphone? Type instead</summary>
+        <form id="typeForm">
+          <input id="typeInput" type="text" placeholder="Type what the seller would say" autocomplete="off">
+          <button class="btn" type="submit">Send</button>
+        </form>
+      </details>
+    </div>
+  </section>
+
+  <section>
+    <div class="card">
+      <div class="snap-head">
+        <h2>Seller snapshot</h2>
+        <button id="snapToggle" class="link" type="button" aria-expanded="true">Hide</button>
+      </div>
+      <select id="sellerSelect" aria-label="Choose a seller scenario"></select>
+      <div id="seller" class="empty">Loading…</div>
+      <div id="sellerNote" class="note"></div>
+    </div>
+    <div class="card">
+      <h2>What Disha did on this call</h2>
+      <div id="actions"><span class="empty">Her checks and actions appear here as the call goes on.</span></div>
+    </div>
+    <div class="card">
+      <h2>Action plan and follow-up</h2>
+      <div id="plan"><span class="empty">Nothing saved yet.</span></div>
+    </div>
+  </section>
+</main>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+
+  const LABELS = {
+    idle: 'Press “Call Disha” to start',
+    listening: 'Listening… speak whenever you are ready',
+    hearing: 'Hearing you… (tap circle or pause when done)',
+    thinking: 'Thinking…',
+    speaking: 'Disha is speaking. Tap circle to interrupt.'
+  };
+  const TOOL_LABELS = {
+    get_seller_metrics: 'Pulled sales, orders and cancellation numbers',
+    diagnose_sales_drop: 'Worked out what is driving the sales drop',
+    get_cancellation_breakdown: 'Checked why orders are being cancelled',
+    get_out_of_stock_products: 'Listed the out-of-stock products hurting sales',
+    get_traffic_and_visibility: 'Checked traffic, conversion and visibility',
+    get_pricing_insights: 'Compared your prices with the market',
+    create_action_plan: 'Saved the action plan',
+    schedule_followup: 'Booked a follow-up call',
+    send_summary: 'Sent the summary (WhatsApp, mock)'
+  };
+
+  // Voice activity detection settings
+  const SPEECH_THRESHOLD = 0.012;  // More sensitive to speech
+  const END_SILENCE_MS = 550;      // Fast 550ms silence ends turn (natural conversational pace)
+  const MAX_UTTERANCE_MS = 25000;
+  const MIN_SPEECH_MS = 350;
+
+  let sessionId = newId();
+  let state = 'idle';
+  let inCall = false;
+  let busy = false;
+  let audioEl = null;
+  let speakResolve = null;
+
+  // microphone & speech recognition
+  let stream = null, ctx = null, srcNode = null, proc = null;
+  let capturing = false, speechStarted = false;
+  let chunks = [], preroll = [], speechMs = 0, silenceMs = 0, totalMs = 0;
+  let recognizer = null, liveTranscript = '';
+
+  function newId() {
+    return (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now()) + Math.random();
+  }
+  function el(tag, cls, text) {
+    const n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text !== undefined) n.textContent = text;
+    return n;
+  }
+  function setLive(text) {
+    const node = $('live');
+    if (node) node.textContent = text || '';
+  }
+  function setState(s) {
+    state = s;
+    $('orb').className = 'orb ' + (s === 'hearing' ? 'listening' : s);
+    $('status').textContent = LABELS[s];
+  }
+
+  // ------------------------------------------------------------ transcript
+  function addMsg(who, text) {
+    const m = el('div', 'msg ' + who);
+    m.appendChild(el('small', '', who === 'disha' ? 'Disha' : 'You'));
+    m.appendChild(document.createTextNode(text));
+    $('transcript').appendChild(m);
+    $('transcript').scrollTop = $('transcript').scrollHeight;
+  }
+  function addError(text) {
+    $('transcript').appendChild(el('div', 'msg err', text));
+    $('transcript').scrollTop = $('transcript').scrollHeight;
+  }
+
+  // ------------------------------------------------------------ microphone and voice activity detection
+  async function ensureMic() {
+    if (stream) return;
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      throw new Error('This browser cannot access the microphone. Use Chrome or Edge on localhost or HTTPS.');
+    }
+    stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
+    srcNode = ctx.createMediaStreamSource(stream);
+    proc = ctx.createScriptProcessor(4096, 1, 1);
+    proc.onaudioprocess = onAudio;
+    srcNode.connect(proc);
+    proc.connect(ctx.destination); // output stays silent; needed so the node keeps running
+  }
+  function releaseMic() {
+    stopRecognition();
+    try { if (proc) proc.disconnect(); if (srcNode) srcNode.disconnect(); } catch (e) { /* ignore */ }
+    if (stream) stream.getTracks().forEach((t) => t.stop());
+    if (ctx) ctx.close();
+    stream = ctx = srcNode = proc = null;
+  }
+
+  function startRecognition() {
+    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRec) return;
+    try {
+      if (recognizer) { recognizer.abort(); }
+      recognizer = new SpeechRec();
+      recognizer.continuous = true;
+      recognizer.interimResults = true;
+      recognizer.lang = ($('langSelect') && $('langSelect').value) ? $('langSelect').value : 'en-IN';
+      liveTranscript = '';
+
+      recognizer.onresult = (e) => {
+        let interim = '';
+        for (let i = e.resultIndex; i < e.results.length; i++) {
+          const trans = e.results[i][0].transcript;
+          if (e.results[i].isFinal) {
+            liveTranscript += ' ' + trans;
+          } else {
+            interim += trans;
+          }
+        }
+        const text = (liveTranscript + ' ' + interim).trim();
+        if (text) {
+          setLive('“' + text + '”');
+          speechStarted = true;
+          silenceMs = 0;
+          setState('hearing');
+        }
+      };
+      recognizer.onerror = () => {};
+      recognizer.start();
+    } catch (e) {}
+  }
+
+  function stopRecognition() {
+    if (recognizer) {
+      try { recognizer.stop(); } catch (e) {}
+      recognizer = null;
+    }
+  }
+
+  function onAudio(e) {
+    if (!capturing) return;
+    const data = new Float32Array(e.inputBuffer.getChannelData(0));
+    const ms = data.length / ctx.sampleRate * 1000;
+    let sum = 0;
+    for (let i = 0; i < data.length; i++) sum += data[i] * data[i];
+    const loud = Math.sqrt(sum / data.length) > SPEECH_THRESHOLD;
+
+    if (!speechStarted) {
+      preroll.push(data);
+      if (preroll.length > 3) preroll.shift();          // keep a short lead-in so the first word is not clipped
+      if (loud) {
+        speechStarted = true;
+        chunks = preroll.slice();
+        preroll = [];
+        speechMs = ms; silenceMs = 0; totalMs = ms;
+        setState('hearing');
+      }
+      return;
+    }
+    chunks.push(data);
+    totalMs += ms;
+    if (loud) { silenceMs = 0; speechMs += ms; } else { silenceMs += ms; }
+    if (silenceMs >= END_SILENCE_MS || totalMs >= MAX_UTTERANCE_MS) finishCapture();
+  }
+
+  function listen() {
+    if (!inCall || busy) return;
+    ensureMic().then(() => {
+      if (!inCall || busy) return;
+      chunks = []; preroll = []; speechStarted = false; speechMs = 0; silenceMs = 0; totalMs = 0;
+      liveTranscript = '';
+      setLive('');
+      capturing = true;
+      setState('listening');
+      startRecognition();
+    }).catch((e) => {
+      addError('Microphone problem: ' + e.message + ' You can type instead using the box below.');
+      endCall();
+    });
+  }
+
+  function finishCapture() {
+    capturing = false;
+    stopRecognition();
+    const textFromLive = (liveTranscript || '').trim();
+    const rate = ctx ? ctx.sampleRate : 16000;
+    const blob = (speechMs >= MIN_SPEECH_MS) ? encodeWav(chunks, rate) : null;
+    chunks = []; preroll = []; liveTranscript = '';
+    setLive('');
+
+    if (textFromLive.length > 2) {
+      sendToAgent(textFromLive, false);
+      return;
+    }
+
+    if (!blob) {
+      setTimeout(() => { if (inCall && !busy) listen(); }, 300);
+      return;
+    }
+    handleUtterance(blob);
+  }
+
+  function encodeWav(parts, inRate) {
+    let len = 0;
+    parts.forEach((c) => { len += c.length; });
+    const merged = new Float32Array(len);
+    let o = 0;
+    parts.forEach((c) => { merged.set(c, o); o += c.length; });
+
+    const outRate = 16000, ratio = inRate / outRate, n = Math.floor(len / ratio);
+    const pcm = new Int16Array(n);
+    for (let i = 0; i < n; i++) {
+      const pos = i * ratio, i0 = Math.floor(pos), i1 = Math.min(i0 + 1, len - 1), f = pos - i0;
+      const v = merged[i0] * (1 - f) + merged[i1] * f;
+      pcm[i] = Math.max(-1, Math.min(1, v)) * 32767;
+    }
+    const header = new ArrayBuffer(44);
+    const dv = new DataView(header);
+    const w = (off, s) => { for (let i = 0; i < s.length; i++) dv.setUint8(off + i, s.charCodeAt(i)); };
+    w(0, 'RIFF'); dv.setUint32(4, 36 + pcm.length * 2, true); w(8, 'WAVE'); w(12, 'fmt ');
+    dv.setUint32(16, 16, true); dv.setUint16(20, 1, true); dv.setUint16(22, 1, true);
+    dv.setUint32(24, outRate, true); dv.setUint32(28, outRate * 2, true);
+    dv.setUint16(32, 2, true); dv.setUint16(34, 16, true); w(36, 'data'); dv.setUint32(40, pcm.length * 2, true);
+    return new Blob([header, pcm.buffer], { type: 'audio/wav' });
+  }
+
+  // ------------------------------------------------------------ one seller turn
+  async function handleUtterance(blob) {
+    busy = true;
+    setState('thinking');
+    let text = '';
+    let hasErr = false;
+    try {
+      const r = await fetch('/api/stt', { method: 'POST', headers: { 'Content-Type': 'audio/wav' }, body: blob });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.error || ('Server error ' + r.status));
+      text = (d.text || '').trim();
+    } catch (e) {
+      hasErr = true;
+      addError('Voice recognition error: ' + e.message);
+    }
+    busy = false;
+    if (hasErr) {
+      setState('listening');
+      return;
+    }
+    if (!text) {
+      setTimeout(() => { if (inCall && !busy) listen(); }, 400);
+      return;
+    }
+    await sendToAgent(text, false);
+  }
+
+  async function sendToAgent(text, hidden) {
+    if (busy) return;
+    busy = true;
+    capturing = false;
+    setState('thinking');
+    if (!hidden) addMsg('seller', text);
+
+    try {
+      const r = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId, message: text, sellerId: $('sellerSelect').value })
+      });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.error || ('Server error ' + r.status));
+      renderTools(d.toolCalls || []);
+      renderState(d.state || {});
+      addMsg('disha', d.reply);
+      await speak(d.reply);
+    } catch (e) {
+      addError('Something went wrong: ' + e.message);
+    } finally {
+      busy = false;
+    }
+    if (inCall) listen();
+  }
+
+  // ------------------------------------------------------------ speaking
+  async function speak(text) {
+    const fastVoice = $('fastVoiceToggle') ? $('fastVoiceToggle').checked : true;
+    if (fastVoice) {
+      setState('speaking');
+      await browserSpeak(text);
+      return;
+    }
+    try {
+      const r = await fetch('/api/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text })
+      });
+      if (!r.ok) {
+        const errJson = await r.json().catch(() => ({}));
+        throw new Error(errJson.error || ('TTS error ' + r.status));
+      }
+      const url = URL.createObjectURL(await r.blob());
+      audioEl = new Audio(url);
+      setState('speaking');
+      await new Promise((resolve, reject) => {
+        speakResolve = resolve;
+        audioEl.onended = resolve;
+        audioEl.onerror = () => reject(new Error('Audio playback error'));
+        audioEl.play().catch(reject);
+      });
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.warn('TTS playback error, trying browser voice:', e);
+      setState('speaking');
+      await browserSpeak(text);
+    }
+    speakResolve = null;
+  }
+  function browserSpeak(text) {
+    return new Promise((resolve) => {
+      if (!('speechSynthesis' in window)) return resolve();
+      speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      const isHindi = /[\u0900-\u097F]/.test(text);
+      u.lang = isHindi ? 'hi-IN' : 'en-IN';
+      const voices = speechSynthesis.getVoices();
+      if (voices && voices.length > 0) {
+        const found = voices.find((v) => isHindi
+          ? (v.lang.startsWith('hi') || v.name.includes('Hindi') || v.name.includes('Swara') || v.name.includes('Madhur'))
+          : (v.lang === 'en-IN' || v.name.includes('India') || v.name.includes('Neerja') || v.name.includes('Heera')));
+        if (found) u.voice = found;
+      }
+      u.rate = 1.05;
+      speakResolve = resolve;
+      u.onend = resolve;
+      u.onerror = (e) => { console.warn('browserSpeak error:', e); resolve(); };
+      speechSynthesis.speak(u);
+    });
+  }
+  function stopSpeaking() {
+    if ('speechSynthesis' in window) speechSynthesis.cancel();
+    if (audioEl) audioEl.pause();
+    if (speakResolve) speakResolve();
+  }
+
+  // ------------------------------------------------------------ call lifecycle
+  async function startCall() {
+    try {
+      await ensureMic();               // ask for the microphone up front
+    } catch (e) {
+      addError('Microphone problem: ' + e.message + ' You can type instead using the box below.');
+    }
+    sessionId = newId();
+    inCall = true;
+    $('sellerSelect').disabled = true;
+    $('transcript').textContent = '';
+    $('actions').textContent = '';
+    $('actions').appendChild(el('span', 'empty', 'Her checks and actions appear here as the call goes on.'));
+    $('plan').textContent = '';
+    $('plan').appendChild(el('span', 'empty', 'Nothing saved yet.'));
+    $('callBtn').hidden = true;
+    $('endBtn').hidden = false;
+    sendToAgent('__START__', true);    // Disha greets first, then waits for the seller
+  }
+  function endCall() {
+    inCall = false;
+    capturing = false;
+    stopSpeaking();
+    releaseMic();
+    $('sellerSelect').disabled = false;
+    $('callBtn').hidden = false;
+    $('endBtn').hidden = true;
+    setState('idle');
+  }
+
+  // ------------------------------------------------------------ side panels
+  function renderTools(calls) {
+    if (!calls.length) return;
+    const box = $('actions');
+    if (box.querySelector('.empty')) box.textContent = '';
+    calls.forEach((c) => {
+      const d = el('details');
+      d.appendChild(el('summary', '', TOOL_LABELS[c.name] || c.name));
+      d.appendChild(el('pre', '', JSON.stringify(c.result, null, 2)));
+      box.appendChild(d);
+    });
+  }
+  function renderState(st) {
+    if (!st.plan && !st.followUp && !st.summary) return;
+    const box = $('plan');
+    box.textContent = '';
+    if (st.plan) {
+      const head = el('div', '', 'Plan ' + st.plan.planId);
+      head.style.fontWeight = '700';
+      box.appendChild(head);
+      (st.plan.issues || []).forEach((i) => {
+        const p = el('div', '', i);
+        p.style.fontSize = '14px';
+        p.style.color = 'var(--mute)';
+        box.appendChild(p);
+      });
+      (st.plan.actions || []).forEach((a) => {
+        const row = el('div', 'plan-item');
+        const t = el('b', '', a.title);
+        t.appendChild(el('span', 'tag', (a.priority || 'medium') + ' priority, within ' + (a.dueInDays || 3) + ' days'));
+        row.appendChild(t);
+        row.appendChild(el('span', '', a.detail || ''));
+        box.appendChild(row);
+      });
+    }
+    if (st.followUp) {
+      const f = el('div', '', 'Follow-up call: ' + st.followUp.date + '. ' + (st.followUp.reason || ''));
+      f.style.marginTop = '8px';
+      box.appendChild(f);
+    }
+    if (st.summary) {
+      const label = el('div', '', 'Message sent on ' + st.summary.channel + ' (mock):');
+      label.style.marginTop = '10px';
+      box.appendChild(label);
+      box.appendChild(el('div', 'wa', st.summary.text));
+    }
+  }
+
+  const inr = (n) => '₹' + Number(n).toLocaleString('en-IN');
+  function changeCell(a, b, kind) {
+    const c = el('td', 'num');
+    let text, cls;
+    if (kind === 'pts') { const d = b - a; text = (d > 0 ? '+' : '') + d + ' pts'; cls = d > 0 ? 'down' : 'up'; }
+    else if (kind === 'count') { const d = b - a; text = (d > 0 ? '+' : '') + d; cls = d > 0 ? 'down' : 'up'; }
+    else { const d = Math.round((b - a) / a * 1000) / 10; text = (d > 0 ? '+' : '') + d + '%'; cls = d < 0 ? 'down' : (d > 0 ? 'up' : ''); }
+    c.textContent = text;
+    if (cls) c.className = 'num ' + cls;
+    return c;
+  }
+  async function loadSeller() {
+    const box = $('seller');
+    try {
+      const id = $('sellerSelect').value;
+      const d = await (await fetch('/api/seller' + (id ? '?id=' + encodeURIComponent(id) : ''))).json();
+      const lm = d.metrics.lastMonth, tm = d.metrics.thisMonth;
+      box.textContent = '';
+      box.className = '';
+      const who = el('div', '', d.seller.name + ', ' + d.seller.business);
+      who.style.fontWeight = '700';
+      who.style.marginBottom = '6px';
+      box.appendChild(who);
+      const t = el('table');
+      const hr = el('tr');
+      [['Metric', ''], ['Last month', 'num'], ['This month', 'num'], ['Change', 'num']].forEach(([h2, c]) => hr.appendChild(el('th', c, h2)));
+      t.appendChild(hr);
+      const rows = [
+        ['Sales', inr(lm.sales), inr(tm.sales), lm.sales, tm.sales, 'pct'],
+        ['Orders', lm.orders, tm.orders, lm.orders, tm.orders, 'pct'],
+        ['Cancellation rate', lm.cancellationRate + '%', tm.cancellationRate + '%', lm.cancellationRate, tm.cancellationRate, 'pts'],
+        ['Average selling price', inr(lm.avgSellingPrice), inr(tm.avgSellingPrice), lm.avgSellingPrice, tm.avgSellingPrice, 'pct'],
+        ['Out-of-stock products', lm.outOfStockProducts, tm.outOfStockProducts, lm.outOfStockProducts, tm.outOfStockProducts, 'count']
+      ];
+      if (d.traffic && d.traffic.lastMonth && d.traffic.thisMonth) {
+        const li = d.traffic.lastMonth.impressions, ti = d.traffic.thisMonth.impressions;
+        const lc = lm.orders / li * 100, tc = tm.orders / ti * 100;
+        rows.push(['Impressions', li.toLocaleString('en-IN'), ti.toLocaleString('en-IN'), li, ti, 'pct']);
+        rows.push(['Conversion rate', lc.toFixed(2) + '%', tc.toFixed(2) + '%', lc, tc, 'pct']);
+      }
+      rows.forEach((r) => {
+        const tr = el('tr');
+        tr.appendChild(el('td', '', r[0]));
+        tr.appendChild(el('td', 'num', String(r[1])));
+        tr.appendChild(el('td', 'num', String(r[2])));
+        tr.appendChild(changeCell(r[3], r[4], r[5]));
+        t.appendChild(tr);
+      });
+      box.appendChild(t);
+      const isDefault = $('sellerSelect').selectedOptions[0] && $('sellerSelect').selectedOptions[0].dataset.default === 'true';
+      $('sellerNote').textContent = isDefault
+        ? 'Sample data from the assignment brief.'
+        : 'Extra mock seller added to show the logic adapts to different problems.';
+    } catch (e) {
+      box.textContent = 'Could not load seller data.';
+    }
+  }
+
+  async function initSellers() {
+    const sel = $('sellerSelect');
+    try {
+      const list = await (await fetch('/api/sellers')).json();
+      sel.textContent = '';
+      list.forEach((s) => {
+        const o = document.createElement('option');
+        o.value = s.id;
+        o.dataset.default = String(!!s.isDefault);
+        o.textContent = s.name + ', ' + s.business + (s.isDefault ? ' (assignment sample)' : '');
+        sel.appendChild(o);
+      });
+      const def = list.find((s) => s.isDefault);
+      if (def) sel.value = def.id;
+    } catch (e) { /* the snapshot loader reports the error */ }
+    loadSeller();
+  }
+
+  function resetPanels() {
+    $('actions').textContent = '';
+    $('actions').appendChild(el('span', 'empty', 'Her checks and actions appear here as the call goes on.'));
+    $('plan').textContent = '';
+    $('plan').appendChild(el('span', 'empty', 'Nothing saved yet.'));
+    $('transcript').textContent = '';
+  }
+
+  // ------------------------------------------------------------ wiring
+  $('sellerSelect').addEventListener('change', () => { resetPanels(); loadSeller(); });
+  $('snapToggle').addEventListener('click', () => {
+    const body = $('seller');
+    body.hidden = !body.hidden;
+    $('sellerNote').hidden = body.hidden;
+    $('snapToggle').textContent = body.hidden ? 'Show' : 'Hide';
+    $('snapToggle').setAttribute('aria-expanded', String(!body.hidden));
+  });
+  $('callBtn').addEventListener('click', startCall);
+  $('endBtn').addEventListener('click', endCall);
+  $('orb').addEventListener('click', () => {
+    if (state === 'speaking') {
+      stopSpeaking();
+    } else if (state === 'hearing' || state === 'listening') {
+      if (speechStarted || (liveTranscript && liveTranscript.trim().length > 0)) {
+        finishCapture();
+      }
+    } else if (!inCall) {
+      startCall();
+    }
+  });
+  $('typeForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const text = $('typeInput').value.trim();
+    if (!inCall) { addError('Press “Call Disha” first.'); return; }
+    if (!text) return;
+    $('typeInput').value = '';
+    capturing = false;
+    stopSpeaking();
+    sendToAgent(text, false);
+  });
+
+  setState('idle');
+  initSellers();
+})();
+</script>
+</body>
+</html>
